@@ -36,7 +36,7 @@ public class CinemaService {
         return new SeatDto(seat.getRow(), seat.getColumn(), seat.getPrice());
     }
 
-    public SeatDto checkAvailabilityAndBuy(Cinema cinema, int row, int column) {
+    public Purchase checkAvailabilityAndBuy(Cinema cinema, int row, int column) {
         if (row <= 0 || row > CINEMA_ROWS_NUMBER || column <= 0 || column > CINEMA_COLUMNS_NUMBER) {
             throw new IllegalArgumentException();
         }
@@ -45,9 +45,28 @@ public class CinemaService {
         final Seat chosenSeat = cinemaHall.get(chosenSeatCoordinates);
         if (chosenSeat.isAvailable()) {
             chosenSeat.setAvailable(false);
-            return toSeatDto(chosenSeat);
+            final Purchase purchasedTicket = new Purchase(toSeatDto(chosenSeat));
+            cinema.purchasedTicketsList().add(purchasedTicket);
+            return purchasedTicket;
         } else {
             throw new IllegalStateException();
         }
+    }
+
+    public ReturnedTicket returnTicket(Cinema cinema, Identifier identifier) {
+        if (cinema == null || identifier == null)
+            throw new IllegalArgumentException();
+        final Optional<Purchase> purchase = cinema.purchasedTicketsList().stream()
+                .filter(p -> p.getIdentifier().getToken().equals(identifier.getToken()))
+                .findFirst();
+        final Purchase bought = purchase.orElse(null);
+        if (bought != null) {
+            final SeatDto seatDto = bought.seatDto();
+            final SeatCoordinates seatCoordinates = new SeatCoordinates(seatDto.row(), seatDto.column());
+            cinema.availableSeats().get(seatCoordinates).setAvailable(true);
+            cinema.purchasedTicketsList().remove(bought);
+            return new ReturnedTicket(seatDto);
+        }
+        throw new IllegalArgumentException();
     }
 }
