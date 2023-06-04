@@ -2,7 +2,7 @@ package cinema.model;
 
 import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode(callSuper = false)
+//@EqualsAndHashCode(callSuper = false)
 public record SeatCoordinates(Integer row, Integer column) implements Comparable<SeatCoordinates> {
 
     @Override

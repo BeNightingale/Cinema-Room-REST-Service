@@ -1,10 +1,13 @@
 package cinema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Seat {
 
     private final int row;
     private final int column;
     private final int price;
+    @JsonIgnore
     private boolean available;
 
     public Seat(int row, int column, int price) {

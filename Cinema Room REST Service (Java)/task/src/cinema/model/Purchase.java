@@ -9,19 +9,19 @@ public final class Purchase {
     @JsonUnwrapped
     private Identifier identifier;
     @JsonProperty
-    private SeatDto seatDto;
+    private Seat seat;
 
     public Purchase() {
     }
 
-    public Purchase(SeatDto seatDto) {
+    public Purchase(Seat seat) {
         this.identifier = new Identifier();
-        this.seatDto = seatDto;
+        this.seat = seat;
     }
 
     @JsonGetter(value = "ticket")
-    public SeatDto seatDto() {
-        return seatDto;
+    public Seat seat() {
+        return seat;
     }
 
     @JsonGetter(value = "token")

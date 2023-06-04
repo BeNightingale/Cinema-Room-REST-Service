@@ -2,7 +2,7 @@ package cinema.exception;
 
 public class BadCoordinatesException extends IllegalArgumentException {
 
-    String error;
+    private final String error;
 
     public BadCoordinatesException() {
         super("The number of a row or a column is out of bounds!");

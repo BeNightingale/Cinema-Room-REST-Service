@@ -1,5 +1,6 @@
 package cinema;
 
+import cinema.exception.AuthorizationException;
 import cinema.exception.BadCoordinatesException;
 import cinema.exception.SeatNotAvailableException;
 import cinema.exception.WrongTokenException;
@@ -13,13 +14,13 @@ import java.util.ArrayList;
 @RestController()
 public class Controller {
 
-    private final CinemaService service = new CinemaService(); // ten bean jest potrzebny już w trakcie tworzenia obiektu Controllera, więc nie może być wstrzyknięty
+    private final CinemaService service = new CinemaService(); // This bean is needed during creating Controller object, so it can't be injected here
     private final Cinema cinema = new Cinema(
-            9, 9,
-            service.createFullCinemaSeatsList(9, 9),
+            CinemaConstants.CINEMA_ROWS_NUMBER, CinemaConstants.CINEMA_COLUMNS_NUMBER,
+            service.createFullCinemaSeatsList(),
             new ArrayList<>());
 
-    @GetMapping(value = "/seats")
+    @GetMapping(value = "/seats") // shows only available seats
     public CinemaDto getCinemaState() {
         return service.toCinemaDto(cinema);
     }
@@ -43,10 +44,16 @@ public class Controller {
     @PostMapping("/return")
     public ResponseEntity<?> returnTicket(@RequestBody Identifier identifier) {
         try {
-            final ReturnedTicket returnedTicket = service.returnTicket(this.cinema, identifier);
-            return ResponseEntity.ok(returnedTicket);
+            return ResponseEntity.ok(service.returnTicket(this.cinema, identifier));
         } catch (IllegalArgumentException argEx) {
             throw new WrongTokenException();
         }
+    }
+
+    @PostMapping("/stats")
+    public ResponseEntity<?> getStatistics(@RequestParam(required = false) String password) throws AuthorizationException {
+        if (!"super_secret".equals(password))
+            throw new AuthorizationException();
+        return ResponseEntity.ok(service.getStatistics(cinema));
     }
 }

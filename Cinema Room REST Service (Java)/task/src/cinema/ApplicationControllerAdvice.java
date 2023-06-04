@@ -1,5 +1,6 @@
 package cinema;
 
+import cinema.exception.AuthorizationException;
 import cinema.exception.BadCoordinatesException;
 import cinema.exception.SeatNotAvailableException;
 import cinema.exception.WrongTokenException;
@@ -24,7 +25,13 @@ public class ApplicationControllerAdvice {
 
     @ExceptionHandler(WrongTokenException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<WrongTokenException> handleWrongTokenException(WrongTokenException wEx) {
+    public ResponseEntity<WrongTokenException> handleWrongToken(WrongTokenException wEx) {
         return ResponseEntity.badRequest().body(wEx);
+    }
+
+    @ExceptionHandler(AuthorizationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<AuthorizationException> handleBadPassword(AuthorizationException autEx) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(autEx);
     }
 }
